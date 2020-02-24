@@ -104,7 +104,9 @@ public class TurtleWriter extends AbstractRDFWriter implements RDFWriter {
 	 * @param baseIRI
 	 */
 	public TurtleWriter(OutputStream out, ParsedIRI baseIRI) {
-		this(new OutputStreamWriter(out, StandardCharsets.UTF_8), baseIRI);
+		super(out);
+		this.baseIRI = baseIRI;
+		this.writer = new IndentingWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
 	}
 
 	/**
