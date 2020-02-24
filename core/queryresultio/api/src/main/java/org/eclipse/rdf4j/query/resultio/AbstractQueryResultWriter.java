@@ -38,7 +38,7 @@ public abstract class AbstractQueryResultWriter implements QueryResultWriter {
 	}
 
 	public Optional<OutputStream> getOutputStream() {
-		return Optional.of(outputStream);
+		return Optional.ofNullable(outputStream);
 	}
 
 	@Override
