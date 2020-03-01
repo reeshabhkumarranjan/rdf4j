@@ -22,10 +22,11 @@ import org.eclipse.rdf4j.sail.shacl.planNodes.Select;
 import org.eclipse.rdf4j.sail.shacl.planNodes.SetFilterNode;
 import org.eclipse.rdf4j.sail.shacl.planNodes.TrimTuple;
 import org.eclipse.rdf4j.sail.shacl.planNodes.Unique;
+import org.eclipse.rdf4j.sail.shacl.planNodes.ValuesBackedNode;
 
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * sh:targetNode
@@ -34,9 +35,9 @@ import java.util.Set;
  */
 public class TargetNode extends NodeShape {
 
-	private final Set<Value> targetNodeSet;
+	private final TreeSet<Value> targetNodeSet;
 
-	TargetNode(Resource id, SailRepositoryConnection connection, boolean deactivated, Set<Value> targetNode) {
+	TargetNode(Resource id, SailRepositoryConnection connection, boolean deactivated, TreeSet<Value> targetNode) {
 		super(id, connection, deactivated);
 		this.targetNodeSet = targetNode;
 		assert !this.targetNodeSet.isEmpty();
@@ -44,7 +45,7 @@ public class TargetNode extends NodeShape {
 
 	@Override
 	public PlanNode getPlan(ConnectionsGroup connectionsGroup, boolean printPlans,
-			PlanNodeProvider overrideTargetNode, boolean negateThisPlan, boolean negateSubPlans) {
+							PlanNodeProvider overrideTargetNode, boolean negateThisPlan, boolean negateSubPlans) {
 		assert !negateSubPlans : "There are no subplans!";
 		assert !negateThisPlan;
 
@@ -55,10 +56,9 @@ public class TargetNode extends NodeShape {
 
 	@Override
 	public PlanNode getPlanAddedStatements(ConnectionsGroup connectionsGroup,
-			PlaneNodeWrapper planeNodeWrapper) {
-		PlanNode parent = connectionsGroup.getCachedNodeFor(
-				new Select(connectionsGroup.getAddedStatements(), getQuery("?a", "?c", null), "?a", "?c"));
-		return new Unique(new TrimTuple(parent, 0, 1));
+										   PlaneNodeWrapper planeNodeWrapper) {
+
+		return new ValuesBackedNode(targetNodeSet);
 
 	}
 
@@ -77,7 +77,7 @@ public class TargetNode extends NodeShape {
 
 	@Override
 	public String getQuery(String subjectVariable, String objectVariable,
-			RdfsSubClassOfReasoner rdfsSubClassOfReasoner) {
+						   RdfsSubClassOfReasoner rdfsSubClassOfReasoner) {
 
 		return targetNodeSet.stream()
 				.map(node -> {
@@ -133,7 +133,7 @@ public class TargetNode extends NodeShape {
 	@Override
 	public String toString() {
 		return "TargetNode{" +
-				"targetNodeSet=" + Arrays.toString(targetNodeSet.toArray()) +
-				'}';
+			"targetNodeSet=" + Arrays.toString(targetNodeSet.toArray()) +
+			'}';
 	}
 }
