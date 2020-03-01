@@ -246,6 +246,7 @@ abstract public class AbstractShaclTest {
 
 		try {
 			Utils.loadShapeData(shaclRepository, shaclFile);
+			Utils.loadInitialData(shaclRepository, shaclPath + "initialData.ttl");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -379,6 +380,7 @@ abstract public class AbstractShaclTest {
 		SailRepository shaclRepository = getShaclSail();
 		try {
 			Utils.loadShapeData(shaclRepository, shaclPath + "shacl.ttl");
+			Utils.loadInitialData(shaclRepository, shaclPath + "initialData.ttl");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -449,6 +451,7 @@ abstract public class AbstractShaclTest {
 		SailRepository shaclRepository = getShaclSail();
 		try {
 			Utils.loadShapeData(shaclRepository, shaclPath + "shacl.ttl");
+			Utils.loadInitialData(shaclRepository, shaclPath + "initialData.ttl");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

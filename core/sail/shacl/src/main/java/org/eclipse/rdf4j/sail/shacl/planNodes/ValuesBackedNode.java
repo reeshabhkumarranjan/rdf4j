@@ -33,7 +33,6 @@ public class ValuesBackedNode implements PlanNode {
 		this.collection = collection;
 	}
 
-
 	@Override
 	public CloseableIteration<Tuple, SailException> iterator() {
 		return new LoggingCloseableIteration(this, validationExecutionLogger) {
@@ -60,7 +59,6 @@ public class ValuesBackedNode implements PlanNode {
 			}
 		};
 	}
-
 
 	@Override
 	public int depth() {
@@ -91,10 +89,10 @@ public class ValuesBackedNode implements PlanNode {
 	@Override
 	public String toString() {
 		return "ValuesBackedNode{" +
-			"collection=" + collection +
-			", validationExecutionLogger=" + validationExecutionLogger +
-			", printed=" + printed +
-			'}';
+				"collection=" + collection +
+				", validationExecutionLogger=" + validationExecutionLogger +
+				", printed=" + printed +
+				'}';
 	}
 
 	@Override

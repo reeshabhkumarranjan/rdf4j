@@ -45,7 +45,7 @@ public class TargetNode extends NodeShape {
 
 	@Override
 	public PlanNode getPlan(ConnectionsGroup connectionsGroup, boolean printPlans,
-							PlanNodeProvider overrideTargetNode, boolean negateThisPlan, boolean negateSubPlans) {
+			PlanNodeProvider overrideTargetNode, boolean negateThisPlan, boolean negateSubPlans) {
 		assert !negateSubPlans : "There are no subplans!";
 		assert !negateThisPlan;
 
@@ -56,7 +56,7 @@ public class TargetNode extends NodeShape {
 
 	@Override
 	public PlanNode getPlanAddedStatements(ConnectionsGroup connectionsGroup,
-										   PlaneNodeWrapper planeNodeWrapper) {
+			PlaneNodeWrapper planeNodeWrapper) {
 
 		return new ValuesBackedNode(targetNodeSet);
 
@@ -77,31 +77,35 @@ public class TargetNode extends NodeShape {
 
 	@Override
 	public String getQuery(String subjectVariable, String objectVariable,
-						   RdfsSubClassOfReasoner rdfsSubClassOfReasoner) {
+			RdfsSubClassOfReasoner rdfsSubClassOfReasoner) {
 
-		return targetNodeSet.stream()
-				.map(node -> {
-					if (node instanceof Resource) {
-						return "<" + node + ">";
+		StringBuilder sb = new StringBuilder();
+		sb.append("VALUES ( ").append(subjectVariable).append(" ) {\n");
+
+		targetNodeSet.stream()
+				.map(value -> {
+					if (value instanceof Resource) {
+						return "<" + value + ">";
 					}
-					if (node instanceof Literal) {
-						IRI datatype = ((Literal) node).getDatatype();
+					if (value instanceof Literal) {
+						IRI datatype = ((Literal) value).getDatatype();
 						if (datatype == null) {
-							return "\"" + node.stringValue() + "\"";
+							return "\"" + value.stringValue() + "\"";
 						}
-						return "\"" + node.stringValue() + "\"^^<" + datatype.stringValue() + ">";
+						if (((Literal) value).getLanguage().isPresent()) {
+							return "\"" + value.stringValue() + "\"@" + ((Literal) value).getLanguage().get();
+						}
+						return "\"" + value.stringValue() + "\"^^<" + datatype.stringValue() + ">";
 					}
 
-					throw new IllegalStateException(node.getClass().getSimpleName());
+					throw new IllegalStateException(value.getClass().getSimpleName());
 
 				})
-				.map(r -> "{{ select * where {BIND(" + r + " as " + subjectVariable + "). " + subjectVariable + " ?b1 "
-						+ objectVariable + " .}}}"
-						+ "\n UNION \n"
-						+ "{{ select * where {BIND(" + r + " as " + subjectVariable + "). " + objectVariable + " ?b1 "
-						+ subjectVariable + " .}}}")
-				.reduce((a, b) -> a + " UNION " + b)
-				.get();
+				.forEach(value -> sb.append("( ").append(value).append(" )\n"));
+
+		sb.append("}\n");
+
+		return sb.toString();
 
 	}
 
@@ -133,7 +137,7 @@ public class TargetNode extends NodeShape {
 	@Override
 	public String toString() {
 		return "TargetNode{" +
-			"targetNodeSet=" + Arrays.toString(targetNodeSet.toArray()) +
-			'}';
+				"targetNodeSet=" + Arrays.toString(targetNodeSet.toArray()) +
+				'}';
 	}
 }

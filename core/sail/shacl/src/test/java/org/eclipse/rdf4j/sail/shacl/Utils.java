@@ -27,8 +27,8 @@ import org.eclipse.rdf4j.sail.SailConnection;
 import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
 import java.io.IOException;
-import java.net.URL;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.UUID;
 
 /**
@@ -128,6 +128,28 @@ public class Utils {
 			throw new RuntimeException(e);
 		}
 		return sailRepository;
+	}
+
+	public static void loadInitialData(SailRepository repo, String resourceName) throws IOException {
+		((ShaclSail) repo.getSail()).disableValidation();
+
+		try {
+			try (InputStream shapesData = Utils.class.getClassLoader().getResourceAsStream(resourceName)) {
+
+				if (shapesData == null) {
+					return;
+				}
+
+				try (RepositoryConnection conn = repo.getConnection()) {
+					conn.begin(IsolationLevels.NONE);
+					conn.add(shapesData, "", RDFFormat.TURTLE);
+					conn.commit();
+				}
+			}
+		} finally {
+			((ShaclSail) repo.getSail()).enableValidation();
+		}
+
 	}
 
 	static class Ex {
